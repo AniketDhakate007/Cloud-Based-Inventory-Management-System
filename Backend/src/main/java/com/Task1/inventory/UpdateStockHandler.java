@@ -2,19 +2,22 @@ package com.Task1.inventory;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateStockHandler implements RequestHandler<Map<String, Object>, String> {
+public class UpdateStockHandler implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final String TABLE_NAME = "InventoryDB";
     private final DynamoDbClient dynamoDb;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public UpdateStockHandler() {
         this.dynamoDb = DynamoDbClient.builder()
@@ -23,39 +26,74 @@ public class UpdateStockHandler implements RequestHandler<Map<String, Object>, S
     }
 
     @Override
-    public String handleRequest(Map<String, Object> input, Context context) {
-        String shopId = (String) input.get("shopId");
-        String productId = (String) input.get("productId");
-        Integer newStockLevel = (Integer) input.get("stockLevel");
-
-        if (shopId == null || productId == null || newStockLevel == null) {
-            return "Error: Missing required input parameters";
-        }
-
-        Map<String, AttributeValue> key = new HashMap<>();
-        key.put("ShopID", AttributeValue.builder().s(shopId).build());
-        key.put("SK", AttributeValue.builder().s("PRODUCT#" + productId).build());
-
-        Map<String, String> expressionAttributeNames = new HashMap<>();
-        expressionAttributeNames.put("#SL", "StockLevel");
-
-        Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-        expressionAttributeValues.put(":newStock", AttributeValue.builder().n(newStockLevel.toString()).build());
-
-        UpdateItemRequest updateRequest = UpdateItemRequest.builder()
-                .tableName(TABLE_NAME)
-                .key(key)
-                .updateExpression("SET #SL = :newStock")
-                .expressionAttributeNames(expressionAttributeNames)
-                .expressionAttributeValues(expressionAttributeValues)
-                .build();
+    public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
+        Map<String, Object> responseBody = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
 
         try {
-            UpdateItemResponse response = dynamoDb.updateItem(updateRequest);
-            return "Stock updated successfully for product: " + productId;
+            String bodyJson = (String) input.get("body");
+            if (bodyJson == null) {
+                responseBody.put("error", "Missing request body");
+                return createResponse(400, responseBody);
+            }
+
+            Map<String, Object> body = mapper.readValue(bodyJson, Map.class);
+
+            String shopId = (String) body.get("shopId");
+            String productId = (String) body.get("productId"); // sort key ItemId
+            Integer stockLevel = null;
+
+            Object stockLevelObj = body.get("stockLevel");
+            if (stockLevelObj instanceof Integer) {
+                stockLevel = (Integer) stockLevelObj;
+            } else if (stockLevelObj instanceof String) {
+                stockLevel = Integer.parseInt((String) stockLevelObj);
+            } else {
+                responseBody.put("error", "Invalid stockLevel value");
+                return createResponse(400, responseBody);
+            }
+
+            if (shopId == null || productId == null || stockLevel == null) {
+                responseBody.put("error", "Missing required parameters: shopId, productId, stockLevel");
+                return createResponse(400, responseBody);
+            }
+
+            Map<String, AttributeValue> key = new HashMap<>();
+            key.put("ShopId", AttributeValue.builder().s(shopId).build());
+            key.put("ItemId", AttributeValue.builder().s(productId).build());
+
+            String updateExpression = "SET StockLevel = :stockLevelVal";
+            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
+            expressionAttributeValues.put(":stockLevelVal", AttributeValue.builder().n(stockLevel.toString()).build());
+
+            UpdateItemRequest updateRequest = UpdateItemRequest.builder()
+                    .tableName(TABLE_NAME)
+                    .key(key)
+                    .updateExpression(updateExpression)
+                    .expressionAttributeValues(expressionAttributeValues)
+                    .build();
+
+            dynamoDb.updateItem(updateRequest);
+
+            responseBody.put("message", "Stock level updated successfully");
+            return createResponse(200, responseBody);
+
         } catch (Exception e) {
             context.getLogger().log("Error updating stock: " + e.getMessage());
-            return "Error updating stock: " + e.getMessage();
+            responseBody.put("error", e.getMessage());
+            return createResponse(500, responseBody);
         }
+    }
+
+    private Map<String, Object> createResponse(int statusCode, Map<String, Object> bodyMap) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            response.put("statusCode", statusCode);
+            response.put("body", mapper.writeValueAsString(bodyMap));
+        } catch (Exception e) {
+            response.put("statusCode", 500);
+            response.put("body", "{\"error\":\"Failed to serialize response\"}");
+        }
+        return response;
     }
 }
