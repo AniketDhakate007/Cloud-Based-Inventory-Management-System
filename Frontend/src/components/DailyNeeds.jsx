@@ -5,12 +5,12 @@ const InventoryDashboard = () => {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([
-    { name: "Sugar 1kg", stock: 3, threshold: 5, image: "../src/assets/img/sugar.jpg" },
-    { name: "Salt 500g", stock: 8, threshold: 5, image: "../src/assets/img/salt.jpg" },
+    { name: "Sugar 1kg", stock: 3, threshold: 5, image: "../src/assets/img/vim.jpg" },
+    { name: "Salt 500g", stock: 8, threshold: 5, image: "../src/assets/img/saop.jpg" },
     { name: "Wheat Flour 5kg", stock: 2, threshold: 4, image: "../src/assets/img/ashirvad.jpg" },
-    { name: "Rice 10kg", stock: 10, threshold: 6, image: "../src/assets/img/rice2.jpg" },
-    { name: "GoldWinner 10ltr", stock:20 , threshold: 6, image: "../src/assets/img/doldwinner.png" },
-    { name: "KashmiriChilli 10kg", stock: 10, threshold: 6, image: "../src/assets/img/chilli.webp" },
+    { name: "Rice 10kg", stock: 10, threshold: 6, image: "../src/assets/img/surfexcel.jpg" },
+    // { name: "GoldWinner 10ltr", stock:20 , threshold: 6, image: "../src/assets/img/doldwinner.png" },
+    // { name: "KashmiriChilli 10kg", stock: 10, threshold: 6, image: "../src/assets/img/chilli.webp" },
   ]);
 
   const [newProduct, setNewProduct] = useState({
@@ -104,7 +104,7 @@ const handleLogout = () => {
 
       <div className="bg-white bg-opacity-85 rounded-2xl shadow-lg p-6 max-w-7xl mx-auto mt-10">
         <h1 className="text-3xl font-bold text-rose-600 mb-8 text-center">
-        Shop199
+        Daily Needs
         </h1>
 
         {/* ➕ Add Product Section */}

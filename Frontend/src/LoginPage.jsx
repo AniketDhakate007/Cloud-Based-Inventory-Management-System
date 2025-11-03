@@ -10,7 +10,7 @@ export default function LoginPage() {
   const handleLogin = () => {
     // Here you can check credentials (dummy example)
     if (email && password) {
-      navigate("/InventoryDashboard");
+      navigate("/Home");
     } else {
       alert("Please enter valid credentials!");
     }
