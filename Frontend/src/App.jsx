@@ -1,35 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// // App.js
+// import React from "react";
+// import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+// import Home from "./Home";
+// import InventoryDashboard from "./components/InventoryDashboard";
+// import FruitDashboard from "./components/FruitDashboard";
+// import DailyNeeds from "./components/DailyNeeds";
+// import LoginPage from "./LoginPage";
+// // function App() {
+// //   return (
+// //     <Router>
+// //      <Routes>
+// //   <Route path="/" element={<Home />} />
+// //   <Route path="/shop/:shopId" element={<InventoryDashboard />} />
+// //   <Route path="/shop/2" element={<FruitDashboard />} />
+// //   <Route path="/shop/dailyneeds" element={<DailyNeeds />} />
+// //   <Route path="/login" element={<LoginPage />} />
+
+// // </Routes>
+
+// //     </Router>
+// //   );
+// // }
+
+
+// function App() {
+//   return (
+//     <Router>
+//       <Routes>
+//         {/* Default route should redirect to login */}
+//         <Route path="/" element={<Navigate to="/LoginPage" />} />
+
+//         {/* Login page */}
+//         <Route path="/login" element={<LoginPage />} />
+
+//         {/* Home page */}
+//         <Route path="/home" element={<Home />} />
+
+//         {/* Shop pages */}
+//         <Route path="/shop/1" element={<InventoryDashboard />} />
+//         <Route path="/shop/2" element={<FruitDashboard />} />
+//         <Route path="/shop/dailyneeds" element={<DailyNeeds />} />
+//       </Routes>
+//     </Router>
+//   );
+// }
+
+// export default App;
+
+
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./Home";
+import LoginPage from "./LoginPage";
+import SignupPage from "./SignupPage";
+import InventoryDashboard from "./components/InventoryDashboard";
+import FruitDashboard from "./components/FruitDashboard";
+import DailyNeeds from "./components/DailyNeeds";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Routes>
+        {/* Redirect root to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/SignupPage" element={<SignupPage />} />
+        {/* Login and Home */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/home" element={<Home />} />
+
+        {/* Shop routes */}
+        <Route path="/shop/1" element={<InventoryDashboard />} />
+        <Route path="/shop/2" element={<FruitDashboard />} />
+        <Route path="/shop/dailyneeds" element={<DailyNeeds />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
