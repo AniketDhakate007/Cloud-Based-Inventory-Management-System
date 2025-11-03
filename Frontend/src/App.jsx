@@ -1,54 +1,60 @@
-
 import React from "react";
 import { Amplify } from "aws-amplify";
-import awsExports from "./aws-exports";
 import { Authenticator } from "@aws-amplify/ui-react";
 import '@aws-amplify/ui-react/styles.css';
 import Dashboard from "./components/DashboardComp.jsx";
+import awsExports from "./aws-exports";
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./Home";
-import LoginPage from "./LoginPage";
-import SignupPage from "./SignupPage";
-import InventoryDashboard from "./components/InventoryDashboard";
-import FruitDashboard from "./components/FruitDashboard";
-import DailyNeeds from "./components/DailyNeeds";
+Amplify.configure(awsExports);
 
-  Amplify.configure(awsExports);
-
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         {/* Redirect root to login */}
-//         <Route path="/" element={<Navigate to="/home" replace />} />
-//         <Route path="/SignupPage" element={<SignupPage />} />
-//         {/* Login and Home */}
-//         <Route path="/login" element={<LoginPage />} />
-//         <Route path="/home" element={<Home />} />
-//
-//         {/* Shop routes */}
-//         <Route path="/shop/1" element={<InventoryDashboard />} />
-//         <Route path="/shop/2" element={<FruitDashboard />} />
-//         <Route path="/shop/dailyneeds" element={<DailyNeeds />} />
-//       </Routes>
-//     </Router>
-//   );
-// }
-//
-// export default App;
+const formFields = {
+    signUp: {
+        username: {
+            order: 1,
+            placeholder: 'Username',
+            label: 'Username',
+            isRequired: true,
+        },
+        name: {
+            order: 2,
+            placeholder: 'Enter your name',
+            label: 'Name',
+            isRequired: true,
+        },
+        email: {
+            order: 3,
+            placeholder: 'name@host.com',
+            label: 'Email',
+            isRequired: true,
+        },
+        password: {
+            order: 4,
+            placeholder: 'Password',
+            label: 'Password',
+            isRequired: true,
+        },
+        confirm_password: {
+            order: 5,
+            placeholder: 'Confirm Password',
+            label: 'Confirm Password',
+            isRequired: true,
+        },
+    },
+};
 
 function App() {
-  return (
-      <div className="min-h-screen bg-gray-100">
-        <Authenticator>
-          {({ signOut, user }) => (
-              <Dashboard user={user} signOut={signOut} />
-          )}
-        </Authenticator>
-      </div>
-  );
+    return (
+        <div className="min-h-screen bg-gray-100">
+            <Authenticator
+                formFields={formFields}
+                signUpAttributes={['email', 'name']}
+            >
+                {({ signOut, user }) => (
+                    <Dashboard user={user} signOut={signOut} />
+                )}
+            </Authenticator>
+        </div>
+    );
 }
 
 export default App;
