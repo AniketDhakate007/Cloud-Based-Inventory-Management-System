@@ -27,7 +27,12 @@ public class AddProductHandler implements RequestHandler<Map<String, Object>, Ma
 
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
-        Map<String, Object> response = new HashMap<>();
+        String httpMethod = (String) input.get("httpMethod");
+        if ("OPTIONS".equalsIgnoreCase(httpMethod)) {
+            context.getLogger().log("Received OPTIONS request");
+            return createResponse(200, Map.of());
+        }
+
         Map<String, Object> responseBody = new HashMap<>();
 
         try {
@@ -85,6 +90,11 @@ public class AddProductHandler implements RequestHandler<Map<String, Object>, Ma
         Map<String, Object> response = new HashMap<>();
         try {
             response.put("statusCode", statusCode);
+            response.put("headers", Map.of(
+                    "Access-Control-Allow-Origin", "*",
+                    "Access-Control-Allow-Headers", "Content-Type,Authorization",
+                    "Access-Control-Allow-Methods", "OPTIONS,POST,GET,PUT,DELETE"
+            ));
             response.put("body", mapper.writeValueAsString(bodyMap));
         } catch (Exception e) {
             response.put("statusCode", 500);
