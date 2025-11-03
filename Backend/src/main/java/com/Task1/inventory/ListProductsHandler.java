@@ -2,14 +2,12 @@ package com.Task1.inventory;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
-import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +28,11 @@ public class ListProductsHandler implements RequestHandler<Map<String, Object>, 
             if (value.s() != null) {
                 result.put(key, value.s());
             } else if (value.n() != null) {
-                result.put(key, Integer.parseInt(value.n())); // or Long/Double parsing as needed
+                result.put(key, Integer.parseInt(value.n()));
             } else if (value.bool() != null) {
                 result.put(key, value.bool());
             } else if (value.hasM()) {
                 result.put(key, convertDynamoItemToMap(value.m()));
-            } else if (value.hasL()) {
-                // Handle lists if needed
             } else {
                 result.put(key, null);
             }
@@ -52,7 +48,6 @@ public class ListProductsHandler implements RequestHandler<Map<String, Object>, 
 
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
-
         String httpMethod = (String) input.get("httpMethod");
         if ("OPTIONS".equalsIgnoreCase(httpMethod)) {
             context.getLogger().log("Received OPTIONS request");
@@ -60,26 +55,31 @@ public class ListProductsHandler implements RequestHandler<Map<String, Object>, 
         }
 
         Map<String, Object> responseBody = new HashMap<>();
-        Map<String, Object> response = new HashMap<>();
         try {
-            ScanRequest scanRequest = ScanRequest.builder()
+            String shopId = null;
+            if (input.containsKey("queryStringParameters")) {
+                Map<String, String> queryParams = (Map<String, String>) input.get("queryStringParameters");
+                shopId = queryParams.get("shopId");
+            }
+            if (shopId == null || shopId.isEmpty()) {
+                responseBody.put("error", "Missing shopId parameter");
+                return createResponse(400, responseBody);
+            }
+
+            QueryRequest queryRequest = QueryRequest.builder()
                     .tableName(TABLE_NAME)
+                    .keyConditionExpression("ShopId = :shopId")
+                    .expressionAttributeValues(Map.of(":shopId", AttributeValue.builder().s(shopId).build()))
                     .build();
 
-            ScanResponse scanResponse = dynamoDb.scan(scanRequest);
-
-            var items = scanResponse.items();
+            QueryResponse queryResponse = dynamoDb.query(queryRequest);
+            var items = queryResponse.items();
             var simpleItems = new ArrayList<Map<String, Object>>();
             for (Map<String, AttributeValue> item : items) {
                 simpleItems.add(convertDynamoItemToMap(item));
             }
-
-            String responseBodyString = mapper.writeValueAsString(simpleItems);
             responseBody.put("products", simpleItems);
-
-            // Return success response with CORS headers
             return createResponse(200, responseBody);
-
         } catch (Exception e) {
             context.getLogger().log("Error listing products: " + e.getMessage());
             responseBody.put("error", e.getMessage());

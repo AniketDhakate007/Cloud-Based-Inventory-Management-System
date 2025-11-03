@@ -26,12 +26,12 @@ export default function ProductList({ shop, refreshTrigger }) {
                 </tr>
                 </thead>
                 <tbody>
-                {products.map(p => (
-                    <tr key={p.productId}>
-                        <td className="p-2">{p.productId}</td>
-                        <td className="p-2">{p.productName}</td>
-                        <td className="p-2">{p.stockLevel}</td>
-                        <td className="p-2">
+                {products.map((product) => (
+                    <tr key={product.ItemId} className="border-b hover:bg-gray-50">
+                        <td className="p-3 border">{product.ItemId}</td>
+                        <td className="p-3 border">{product.ProductName}</td>
+                        <td className="p-3 border">{product.StockLevel}</td>
+                        <td className="p-3">
                             <button className="bg-yellow-500 text-white px-2 py-1 text-xs rounded mr-2">Edit</button>
                             <button onClick={() => handleDelete(p.productId)} className="bg-red-500 text-white px-2 py-1 text-xs rounded">Delete</button>
                         </td>

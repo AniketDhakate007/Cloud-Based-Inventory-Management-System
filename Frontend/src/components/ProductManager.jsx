@@ -5,9 +5,10 @@ export default function ProductManager({ shop }) {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
-    const [form, setForm] = useState({ productId: "", productName: "", stockLevel: "" });
+    const [form, setForm] = useState({ ItemId: "", ProductName: "", StockLevel: "" });
     const [error, setError] = useState(null);
 
+    // Fetch products for selected shop
     useEffect(() => {
         if (!shop) return;
         loadProducts();
@@ -18,11 +19,12 @@ export default function ProductManager({ shop }) {
         setError(null);
         try {
             const data = await getProducts(shop.shopId);
+            // assumed response: { products: [ ... ] }
             if (Array.isArray(data.products)) {
                 setProducts(data.products);
             } else {
                 setProducts([]);
-                setError("Invalid products data");
+                setError("No products found or invalid response format.");
             }
         } catch (err) {
             setError("Error loading products: " + err.message);
@@ -35,8 +37,13 @@ export default function ProductManager({ shop }) {
         e.preventDefault();
         setError(null);
         try {
-            await addProduct({ ...form, shopId: shop.shopId });
-            setForm({ productId: "", productName: "", stockLevel: "" });
+            await addProduct({
+                shopId: shop.shopId,
+                ItemId: form.ItemId,
+                ProductName: form.ProductName,
+                StockLevel: parseInt(form.StockLevel)
+            });
+            setForm({ ItemId: "", ProductName: "", StockLevel: "" });
             loadProducts();
         } catch (err) {
             setError("Error adding product: " + err.message);
@@ -47,25 +54,24 @@ export default function ProductManager({ shop }) {
         e.preventDefault();
         setError(null);
         try {
-            await updateProduct(editingProduct.productId, shop.shopId, {
-                productName: form.productName,
-                stockLevel: form.stockLevel,
+            await updateProduct(editingProduct.ItemId, shop.shopId, {
+                ProductName: form.ProductName,
+                StockLevel: parseInt(form.StockLevel),
             });
             setEditingProduct(null);
-            setForm({ productId: "", productName: "", stockLevel: "" });
+            setForm({ ItemId: "", ProductName: "", StockLevel: "" });
             loadProducts();
         } catch (err) {
             setError("Error updating product: " + err.message);
         }
     };
 
-    const handleDelete = async (productId) => {
+
+    const handleDelete = async (itemId) => {
         setError(null);
-        if (!window.confirm("Are you sure you want to delete this product?")) {
-            return;
-        }
+        if (!window.confirm("Are you sure you want to delete this product?")) return;
         try {
-            await deleteProduct(productId, shop.shopId);
+            await deleteProduct(itemId, shop.shopId);
             loadProducts();
         } catch (err) {
             setError("Error deleting product: " + err.message);
@@ -75,15 +81,15 @@ export default function ProductManager({ shop }) {
     const startEdit = (product) => {
         setEditingProduct(product);
         setForm({
-            productId: product.productId,
-            productName: product.productName,
-            stockLevel: product.stockLevel.toString(),
+            ItemId: product.ItemId,
+            ProductName: product.ProductName,
+            StockLevel: product.StockLevel.toString(),
         });
     };
 
     const cancelEdit = () => {
         setEditingProduct(null);
-        setForm({ productId: "", productName: "", stockLevel: "" });
+        setForm({ ItemId: "", ProductName: "", StockLevel: "" });
     };
 
     if (!shop) {
@@ -104,26 +110,26 @@ export default function ProductManager({ shop }) {
                 <h3 className="font-semibold mb-3">{editingProduct ? "Edit Product" : "Add New Product"}</h3>
                 <div className="grid grid-cols-3 gap-3">
                     <input
-                        name="productId"
-                        value={form.productId}
-                        onChange={(e) => setForm({ ...form, productId: e.target.value })}
+                        name="ItemId"
+                        value={form.ItemId}
+                        onChange={(e) => setForm({ ...form, ItemId: e.target.value })}
                         className="border p-2 rounded"
                         placeholder="Product ID"
                         required
                         disabled={editingProduct}
                     />
                     <input
-                        name="productName"
-                        value={form.productName}
-                        onChange={(e) => setForm({ ...form, productName: e.target.value })}
+                        name="ProductName"
+                        value={form.ProductName}
+                        onChange={(e) => setForm({ ...form, ProductName: e.target.value })}
                         className="border p-2 rounded"
                         placeholder="Product Name"
                         required
                     />
                     <input
-                        name="stockLevel"
-                        value={form.stockLevel}
-                        onChange={(e) => setForm({ ...form, stockLevel: e.target.value })}
+                        name="StockLevel"
+                        value={form.StockLevel}
+                        onChange={(e) => setForm({ ...form, StockLevel: e.target.value })}
                         className="border p-2 rounded"
                         placeholder="Stock Level"
                         type="number"
@@ -166,10 +172,10 @@ export default function ProductManager({ shop }) {
                     </thead>
                     <tbody>
                     {products.map((product) => (
-                        <tr key={product.productId} className="border-b hover:bg-gray-50">
-                            <td className="p-3 border">{product.productId}</td>
-                            <td className="p-3 border">{product.productName}</td>
-                            <td className="p-3 border">{product.stockLevel}</td>
+                        <tr key={product.ItemId} className="border-b hover:bg-gray-50">
+                            <td className="p-3 border">{product.ItemId}</td>
+                            <td className="p-3 border">{product.ProductName}</td>
+                            <td className="p-3 border">{product.StockLevel}</td>
                             <td className="p-3 border">
                                 <button
                                     onClick={() => startEdit(product)}
@@ -178,7 +184,7 @@ export default function ProductManager({ shop }) {
                                     Edit
                                 </button>
                                 <button
-                                    onClick={() => handleDelete(product.productId)}
+                                    onClick={() => handleDelete(product.ItemId)}
                                     className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
                                 >
                                     Delete
