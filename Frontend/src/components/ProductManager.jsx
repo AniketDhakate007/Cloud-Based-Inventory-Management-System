@@ -286,16 +286,15 @@ export default function ProductManager({ shop, onProductsLoaded }) {
     }
   };
 
-  const handleDelete = async (itemId) => {
-    setError(null);
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
+  const handleDelete = async (productId) => {
     try {
-      await deleteProduct(itemId, shop.shopId);
+      await deleteProduct(productId, shop.shopId);
       loadProducts();
     } catch (err) {
       setError("Error deleting product: " + err.message);
     }
   };
+
 
   const startEdit = (product) => {
     setEditingProduct(product);

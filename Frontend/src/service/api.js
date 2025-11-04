@@ -68,9 +68,10 @@ export async function deleteProduct(productId, shopId) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': token || '',
+            Authorization: token || "",
         },
     });
-    if(!res.ok) throw new Error('Failed to delete product');
+    if (!res.ok) throw new Error(await res.text());
     return res.json();
 }
+
