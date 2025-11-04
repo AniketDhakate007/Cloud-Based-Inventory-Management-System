@@ -3,51 +3,91 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const Landing = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  return (
-    <div className="bg-gradient-to-br from-indigo-600 to-purple-600 min-h-screen flex flex-col text-white">
-      {/* Navbar */}
-      <nav className="flex justify-between items-center px-8 py-5 bg-white bg-opacity-10 backdrop-blur-md shadow-md">
-        <h1 className="text-2xl font-bold">SmartInventory</h1>
-      </nav>
+    return (
+        <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black overflow-hidden">
+            {/* Abstract Background Elements */}
+            <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-20 left-10 w-72 h-72 bg-red-600 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-700 rounded-full blur-3xl"></div>
+            </div>
 
-      {/* Hero Section */}
-      <main className="flex flex-col items-center justify-center flex-grow text-center px-4">
-        <motion.h2
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-5xl font-extrabold mb-6"
-        >
-          Manage Your Stock <br /> Smarter & Faster
-        </motion.h2>
+            {/* Main Content */}
+            <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 text-center">
+                {/* Tagline 1 - Small intro */}
+                <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="text-gray-400 text-sm uppercase tracking-widest mb-4"
+                >
+                    Modern Cloud Solution
+                </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="max-w-xl text-lg opacity-90 mb-8"
-        >
-          Real-time stock tracking and smart analytics — all in one simple dashboard.
-        </motion.p>
+                {/* Main Headline */}
+                <motion.h1
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight"
+                >
+                    Smart Inventory
+                    <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-700">
+            Management
+          </span>
+                </motion.h1>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate("/login")}
-          className="px-8 py-3 bg-white text-indigo-700 font-semibold rounded-lg shadow-lg hover:bg-gray-100 transition-all"
-        >
-          🚀 Get Started
-        </motion.button>
-      </main>
+                {/* Feature Taglines */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="space-y-3 mb-12 max-w-3xl"
+                >
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Real-time tracking across multiple locations
+                    </p>
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Intelligent demand forecasting & stock alerts
+                    </p>
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Seamless integration with all your sales channels
+                    </p>
+                </motion.div>
 
-      {/* Footer */}
-      <footer className="py-4 text-center text-sm bg-white bg-opacity-10">
-        © {new Date().getFullYear()} SmartInventory. All rights reserved.
-      </footer>
-    </div>
-  );
+                {/* Single CTA Button */}
+                <motion.button
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                    whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(239, 68, 68, 0.5)" }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate("/login")}
+                    className="px-12 py-4 bg-red-600 hover:bg-red-700 text-white text-lg font-semibold rounded-full shadow-2xl transition-all duration-300"
+                >
+                    Get Started
+                </motion.button>
+
+                {/* Bottom Tagline */}
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.8 }}
+                    className="text-gray-500 text-sm mt-12 max-w-2xl"
+                >
+                    Manage your inventory smarter with cloud-based analytics,
+                    automated reordering, and comprehensive reporting — all from one dashboard
+                </motion.p>
+            </div>
+
+            {/* Subtle Footer Text */}
+            <div className="absolute bottom-6 left-0 right-0 text-center text-gray-600 text-xs">
+                © {new Date().getFullYear()} SmartInventory. Cloud-powered inventory excellence.
+            </div>
+        </div>
+    );
 };
 
 export default Landing;
