@@ -7,15 +7,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  // const handleLogin = () => {
+  //   // Here you can check credentials (dummy example)
+  //   if (email && password) {
+  //     navigate("/Home");
+  //   } else {
+  //     alert("Please enter valid credentials!");
+  //   }
+  // };
+
   const handleLogin = () => {
-    // Here you can check credentials (dummy example)
     if (email && password) {
+      localStorage.setItem("username", email); // save for later
       navigate("/Home");
     } else {
       alert("Please enter valid credentials!");
     }
   };
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
